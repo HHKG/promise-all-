@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 	<head>
 		<meta charset="UTF-8">
 		<title>promise用法</title>
 	</head>
+
 	<body>
 		<!--笔记-->
 		<!--
@@ -18,5 +20,29 @@ Promise.all的用法：传递一个promise数组,当所有的promise都完成（
 *******在什么情况下使用promise呢：出于一个promise失败会影响所有的Promise回调执行以及promise.all会有执行阻塞的情况，我们应该谨慎使用。
 当几个异步是强相关的，后续步骤必须依赖前面几个步骤都完成才能执行。
 		-->
+		<script>
+			init() {
+				let that = this
+				let getRecentEmployee = req.post('/caring/birthday/getRecentBirthdayList') // 请求近3天过生日的同事，和亲友
+				let getEntryDayList = req.post('/caring/birthday/getEntryDayList', {
+					pageIndex: 1,
+					pageSize: 1000
+				}) // 请求今天入职(周年)的同事
+				tips.loading()
+				Promise.all([getRecentEmployee, getEntryDayList]).then((rets) => {
+					tips.loaded()
+					let birthdays = rets[0]
+					let entries = rets[1]
+					let employeeBirthdays = birthdays.filter(x => x.follow_type == '同事')
+					let friendBirthdays = birthdays.filter(x => x.follow_type == '亲友')
+					that.setData({
+						employeeBirthdays,
+						friendBirthdays,
+						entries
+					})
+				})
+			}
+		</script>
 	</body>
+
 </html>
